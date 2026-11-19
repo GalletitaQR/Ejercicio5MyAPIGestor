@@ -1,7 +1,10 @@
 target/
+.env
+.env.*
+!.env.example
+node_modules/
 !.mvn/wrapper/maven-wrapper.jar
 
-### STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -10,21 +13,17 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
 
-### VS Code ###
 .vscode/
 
-### OS & Misc ###
 .DS_Store
 Thumbs.db
 *.log
