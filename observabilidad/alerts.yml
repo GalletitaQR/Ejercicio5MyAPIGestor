@@ -1,0 +1,58 @@
+groups:
+  - name: availability
+    rules:
+      - alert: BackendMetricsTargetDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Prometheus no puede recolectar métricas del backend"
+          description: "Revisa el API y el endpoint interno api:8082/actuator/prometheus."
+
+      - alert: ApplicationHttpProbeFailed
+        expr: probe_success{job="http-probes"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Una comprobación HTTP de la aplicación falló"
+          description: "El endpoint {{ $labels.instance }} no respondió con HTTP 2xx."
+
+      - alert: DatabaseTcpProbeFailed
+        expr: probe_success{job="database-probe"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MariaDB no acepta conexiones TCP"
+          description: "No se puede conectar a mariadb:3306 desde la red de Compose."
+
+      - alert: HostMetricsTargetDown
+        expr: up{job="node-exporter"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node Exporter no está disponible"
+          description: "Revisa el contenedor node-exporter y sus montajes del host."
+
+  - name: resources
+    rules:
+      - alert: HostMemoryLow
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memoria disponible del host menor al 10%"
+          description: "El host tiene menos del 10% de memoria disponible."
+
+      - alert: BackendHttp5xx
+        expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "El backend está devolviendo errores HTTP 5xx"
+          description: "Se detectaron respuestas 5xx en los últimos 5 minutos."
